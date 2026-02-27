@@ -1,3 +1,8 @@
+import { vehicleMatchesFitment } from "@/lib/fitments";
+import type { Vehicle } from "@/types/vehicle";
+import { TESLA_MODELS } from "@/types/vehicle";
+import type { ProductFitment } from "@/types/vehicle";
+
 export type Product = {
   id: string;
   slug: string;
@@ -13,6 +18,8 @@ export type Product = {
   installationNote?: string;
   category: string;
   featured?: boolean;
+  /** Optional detailed fitments; when absent, fit is derived from compatibility. */
+  fitments?: ProductFitment[];
 };
 
 export const products: Product[] = [
@@ -114,4 +121,14 @@ export function formatPrice(cents: number): string {
     currency: "USD",
     minimumFractionDigits: 2,
   }).format(cents / 100);
+}
+
+/** Returns true if the product fits the given vehicle (uses fitments when present, else compatibility). */
+export function productFitsVehicle(product: Product, vehicle: Vehicle): boolean {
+  if (product.fitments?.length) {
+    return product.fitments.some((f) => vehicleMatchesFitment(vehicle, f));
+  }
+  const modelLabel = TESLA_MODELS.find((m) => m.value === vehicle.model)?.label;
+  if (!modelLabel) return false;
+  return product.compatibility.some((c) => c.includes(modelLabel));
 }
