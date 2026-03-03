@@ -31,9 +31,11 @@ export async function GET() {
           typeof session.payment_intent === "string"
             ? session.payment_intent
             : session.payment_intent?.id;
-        const pi =
-          paymentIntent &&
-          (await stripe.paymentIntents.retrieve(paymentIntent).catch(() => null));
+        const pi = paymentIntent
+          ? ((await stripe.paymentIntents
+              .retrieve(paymentIntent)
+              .catch(() => null)) as Stripe.PaymentIntent | null)
+          : null;
         const metadata = (pi?.metadata ?? {}) as Record<string, string>;
         const lineItems = await stripe.checkout.sessions.listLineItems(
           session.id
