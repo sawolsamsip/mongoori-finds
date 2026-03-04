@@ -21,9 +21,16 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: "Cart is empty" }, { status: 400 });
     }
 
+    // Success/cancel URL: prefer env, then request origin (so 192.168.x.x or finds.mongoori.com works), else localhost
+    const originHeader = req.headers.get("origin");
+    const referer = req.headers.get("referer");
+    const originFromReferer = referer ? (() => { try { return new URL(referer).origin; } catch { return ""; } })() : "";
+    const requestOrigin = originHeader || originFromReferer || "";
     const baseUrl =
       process.env.NEXT_PUBLIC_APP_URL ||
-      (process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : "http://localhost:4173");
+      (process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : null) ||
+      requestOrigin ||
+      "http://localhost:4173";
 
     const line_items: Stripe.Checkout.SessionCreateParams.LineItem[] = items.map((item) => ({
       price_data: {
