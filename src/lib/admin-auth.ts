@@ -4,8 +4,13 @@ import { createHmac, timingSafeEqual } from "crypto";
 const COOKIE_NAME = "admin_token";
 const SALT = "mongoori-finds-admin";
 
+export function getAdminPassword(): string | null {
+  const pw = process.env.ADMIN_PASSWORD?.trim();
+  return pw && pw.length > 0 ? pw : null;
+}
+
 export function getAdminToken(): string | null {
-  const pw = process.env.ADMIN_PASSWORD;
+  const pw = getAdminPassword();
   if (!pw) return null;
   return createHmac("sha256", pw).update(SALT).digest("hex");
 }
@@ -24,6 +29,7 @@ export async function isAdmin(): Promise<boolean> {
   }
 }
 
-export function getSetCookieHeader(value: string): string {
-  return `${COOKIE_NAME}=${value}; Path=/; HttpOnly; SameSite=Lax; Max-Age=${60 * 60 * 24 * 7}`;
+export function getSetCookieHeader(value: string, secure = false): string {
+  const securePart = secure ? "; Secure" : "";
+  return `${COOKIE_NAME}=${value}; Path=/; HttpOnly; SameSite=Lax; Max-Age=${60 * 60 * 24 * 7}${securePart}`;
 }
