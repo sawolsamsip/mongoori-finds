@@ -49,6 +49,8 @@ export async function POST(req: NextRequest) {
       payment_method_types: ["card"],
       line_items,
       allow_promotion_codes: true,
+      shipping_address_collection: { allowed_countries: ["US"] },
+      phone_number_collection: { enabled: true },
       success_url: `${baseUrl}/checkout/success?session_id={CHECKOUT_SESSION_ID}`,
       cancel_url: `${baseUrl}/cart`,
     });

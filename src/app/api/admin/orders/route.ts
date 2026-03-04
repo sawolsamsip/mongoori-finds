@@ -27,10 +27,13 @@ export async function GET() {
     sessions.data
       .filter((s) => s.payment_status === "paid" && s.payment_intent)
       .map(async (session) => {
+        const fullSession = await stripe.checkout.sessions.retrieve(session.id, {
+          expand: [],
+        });
         const paymentIntent =
-          typeof session.payment_intent === "string"
-            ? session.payment_intent
-            : session.payment_intent?.id;
+          typeof fullSession.payment_intent === "string"
+            ? fullSession.payment_intent
+            : fullSession.payment_intent?.id;
         const pi = paymentIntent
           ? ((await stripe.paymentIntents
               .retrieve(paymentIntent)
@@ -38,18 +41,33 @@ export async function GET() {
           : null;
         const metadata = (pi?.metadata ?? {}) as Record<string, string>;
         const lineItems = await stripe.checkout.sessions.listLineItems(
-          session.id
+          fullSession.id
         );
+        const shipping = fullSession.collected_information?.shipping_details;
+        const addr = shipping?.address;
+        const shippingAddress = addr
+          ? [
+              addr.line1,
+              addr.line2,
+              [addr.city, addr.state, addr.postal_code].filter(Boolean).join(", "),
+              addr.country,
+            ]
+            .filter(Boolean)
+            .join("\n")
+          : null;
         return {
-          id: session.id,
+          id: fullSession.id,
           paymentIntentId: paymentIntent ?? null,
-          created: session.created,
-          amountTotal: session.amount_total ?? 0,
-          currency: (session.currency ?? "usd").toUpperCase(),
+          created: fullSession.created,
+          amountTotal: fullSession.amount_total ?? 0,
+          currency: (fullSession.currency ?? "usd").toUpperCase(),
           customerEmail:
-            session.customer_details?.email ??
-            session.customer_email ??
+            fullSession.customer_details?.email ??
+            fullSession.customer_email ??
             null,
+          recipientName: shipping?.name ?? fullSession.customer_details?.name ?? null,
+          shippingAddress,
+          phone: fullSession.customer_details?.phone ?? null,
           shippingStatus: metadata.shipping_status ?? "pending",
           trackingNumber: metadata.tracking_number ?? null,
           lineItems: lineItems.data.map((li) => ({

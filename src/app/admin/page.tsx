@@ -10,6 +10,9 @@ type Order = {
   amountTotal: number;
   currency: string;
   customerEmail: string | null;
+  recipientName: string | null;
+  shippingAddress: string | null;
+  phone: string | null;
   shippingStatus: string;
   trackingNumber: string | null;
   lineItems: Array<{
@@ -252,6 +255,22 @@ export default function AdminPage() {
                     <p className="text-sm text-brand-slate dark:text-brand-silver mt-0.5">
                       {order.customerEmail}
                     </p>
+                  )}
+                  {(order.recipientName || order.shippingAddress || order.phone) && (
+                    <div className="mt-3 p-3 rounded-lg bg-brand-slate/10 dark:bg-brand-slate/20 text-sm">
+                      <p className="font-medium text-brand-black dark:text-brand-white mb-1">Ship to</p>
+                      {order.recipientName && (
+                        <p className="text-brand-slate dark:text-brand-silver">{order.recipientName}</p>
+                      )}
+                      {order.shippingAddress && (
+                        <pre className="mt-1 text-brand-slate dark:text-brand-silver whitespace-pre-wrap font-sans">
+                          {order.shippingAddress}
+                        </pre>
+                      )}
+                      {order.phone && (
+                        <p className="mt-1 text-brand-slate dark:text-brand-silver">Tel: {order.phone}</p>
+                      )}
+                    </div>
                   )}
                 </div>
                 <div className="text-right">
