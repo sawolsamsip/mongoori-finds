@@ -1,4 +1,5 @@
 import Link from "next/link";
+import pkg from "../../package.json";
 
 const shopLinks = [
   { href: "/products", label: "Products" },
@@ -74,7 +75,9 @@ export default function Footer() {
           </div>
         </div>
         <div className="mt-10 pt-8 border-t border-brand-slate text-center text-sm text-brand-silver">
-          <p>&copy; {new Date().getFullYear()} Mongoori Finds. All rights reserved.</p>
+          <p>
+            &copy; {new Date().getFullYear()} Mongoori Finds v{pkg.version}. All rights reserved.
+          </p>
         </div>
       </div>
     </footer>

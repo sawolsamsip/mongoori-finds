@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
+import pkg from "../../../package.json";
 
 type Order = {
   id: string;
@@ -202,7 +203,7 @@ export default function AdminPage() {
             Admin — 주문·배송·환불
           </h1>
           <p className="text-brand-slate dark:text-brand-silver text-sm mt-1">
-            Mongoori Finds
+            Mongoori Finds v{pkg.version}
           </p>
         </div>
         <div className="flex items-center gap-3">
