@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import Stripe from "stripe";
 import { isAdmin } from "@/lib/admin-auth";
+import { sendCustomerShippingEmail, type ShippingStatus } from "@/lib/email";
 
 export async function PATCH(
   req: NextRequest,
@@ -26,7 +27,9 @@ export async function PATCH(
     apiVersion: "2026-02-25.clover",
   });
 
-  const session = await stripe.checkout.sessions.retrieve(sessionId);
+  const session = await stripe.checkout.sessions.retrieve(sessionId, {
+    expand: ["line_items"],
+  });
   const paymentIntentId =
     typeof session.payment_intent === "string"
       ? session.payment_intent
@@ -39,11 +42,64 @@ export async function PATCH(
     );
   }
 
+  const paymentIntent = await stripe.paymentIntents.retrieve(paymentIntentId);
+  const previousStatus = paymentIntent.metadata?.shipping_status ?? "pending";
+
   const metadata: Record<string, string> = {
     shipping_status: shippingStatus ?? "pending",
     ...(trackingNumber != null && { tracking_number: trackingNumber }),
   };
 
   await stripe.paymentIntents.update(paymentIntentId, { metadata });
+
+  // Send customer shipping notification when status changes to shipped or delivered
+  const notifiableStatuses: ShippingStatus[] = ["shipped", "delivered"];
+  const isNotifiable = notifiableStatuses.includes(shippingStatus as ShippingStatus);
+  const hasChanged = shippingStatus !== previousStatus;
+
+  if (isNotifiable && hasChanged) {
+    const customerEmail =
+      session.customer_details?.email ?? session.customer_email ?? null;
+
+    if (customerEmail) {
+      const shipping = session.collected_information?.shipping_details;
+      const addr = shipping?.address;
+      const shippingAddress = addr
+        ? [
+            addr.line1,
+            addr.line2,
+            [addr.city, addr.state, addr.postal_code].filter(Boolean).join(", "),
+            addr.country,
+          ]
+            .filter(Boolean)
+            .join(", ")
+        : null;
+
+      const lineItems = (session.line_items?.data ?? []).map((li) => ({
+        description: li.description,
+        quantity: li.quantity,
+        amount: li.amount_total ?? null,
+      }));
+
+      try {
+        await sendCustomerShippingEmail({
+          customerEmail,
+          customerName:
+            session.customer_details?.name ?? shipping?.name ?? null,
+          orderId: sessionId,
+          shippingStatus: shippingStatus as ShippingStatus,
+          trackingNumber: trackingNumber || null,
+          shippingAddress,
+          lineItems,
+          currency: session.currency ?? "usd",
+          amountTotal: session.amount_total,
+        });
+      } catch (err) {
+        // Log but don't fail the shipping update if email fails
+        console.error("Failed to send shipping notification email:", err);
+      }
+    }
+  }
+
   return NextResponse.json({ ok: true, metadata });
 }
