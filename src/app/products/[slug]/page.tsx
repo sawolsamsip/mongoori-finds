@@ -5,6 +5,7 @@ import { getProductBySlug, formatPrice } from "@/lib/products";
 import AddToCartButton from "./AddToCartButton";
 import ReviewPlaceholder from "@/components/ReviewPlaceholder";
 import TrustBadge from "@/components/TrustBadge";
+import RidesCrossellBanner from "@/components/RidesCrossellBanner";
 import type { Metadata } from "next";
 
 type Props = { params: Promise<{ slug: string }> };
@@ -13,13 +14,35 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { slug } = await params;
   const product = getProductBySlug(slug);
   if (!product) return { title: "Product" };
+  const priceFormatted = (product.price / 100).toFixed(2);
   return {
     title: product.name,
     description: product.shortDescription,
+    alternates: {
+      canonical: `https://finds.mongoori.com/products/${product.slug}`,
+    },
     openGraph: {
       title: product.name,
       description: product.shortDescription,
+      url: `https://finds.mongoori.com/products/${product.slug}`,
+      images: [
+        {
+          url: product.image,
+          width: 800,
+          height: 800,
+          alt: product.name,
+        },
+      ],
+    },
+    twitter: {
+      card: "summary_large_image",
+      title: product.name,
+      description: product.shortDescription,
       images: [product.image],
+    },
+    other: {
+      "product:price:amount": priceFormatted,
+      "product:price:currency": "USD",
     },
   };
 }
@@ -29,7 +52,36 @@ export default async function ProductPage({ params }: Props) {
   const product = getProductBySlug(slug);
   if (!product) notFound();
 
+  const productSchema = {
+    "@context": "https://schema.org",
+    "@type": "Product",
+    name: product.name,
+    description: product.description,
+    image: `https://finds.mongoori.com${product.image}`,
+    brand: {
+      "@type": "Brand",
+      name: "Mongoori Finds",
+    },
+    offers: {
+      "@type": "Offer",
+      url: `https://finds.mongoori.com/products/${product.slug}`,
+      priceCurrency: "USD",
+      price: (product.price / 100).toFixed(2),
+      availability: "https://schema.org/InStock",
+      seller: {
+        "@type": "Organization",
+        name: "Mongoori Finds",
+      },
+    },
+    category: product.category,
+  };
+
   return (
+    <>
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(productSchema) }}
+      />
     <article className="max-w-6xl mx-auto px-4 sm:px-6 py-12 sm:py-16" itemScope itemType="https://schema.org/Product">
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-16">
         <section aria-label="Product gallery" className="space-y-4">
@@ -134,6 +186,11 @@ export default async function ProductPage({ params }: Props) {
       <section className="mt-16 pt-16 border-t border-border">
         <ReviewPlaceholder title="Customer reviews" />
       </section>
+
+      <div className="mt-16 -mx-4 sm:-mx-6">
+        <RidesCrossellBanner />
+      </div>
     </article>
+    </>
   );
 }

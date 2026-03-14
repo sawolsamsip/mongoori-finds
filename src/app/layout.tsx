@@ -10,16 +10,40 @@ import Footer from "@/components/Footer";
 const inter = Inter({ subsets: ["latin"], variable: "--font-sans" });
 
 export const metadata: Metadata = {
+  metadataBase: new URL("https://finds.mongoori.com"),
   title: {
     default: "Mongoori Finds | Tesla Maintenance Essentials",
     template: "%s | Mongoori Finds",
   },
   description:
     "Tesla maintenance essentials tested by a real rental fleet in California. Cabin filters, wipers, key cards, and cleaning kits for Model 3 & Model Y.",
-  keywords: ["Tesla", "Model 3", "Model Y", "maintenance", "accessories", "California"],
+  keywords: ["Tesla", "Model 3", "Model Y", "maintenance", "accessories", "California", "cabin filter", "wiper blades", "key card"],
   openGraph: {
     type: "website",
     locale: "en_US",
+    siteName: "Mongoori Finds",
+    url: "https://finds.mongoori.com",
+    title: "Mongoori Finds | Tesla Maintenance Essentials",
+    description:
+      "Tesla maintenance essentials tested by a real rental fleet in California. Cabin filters, wipers, key cards, and cleaning kits for Model 3 & Model Y.",
+    images: [
+      {
+        url: "/images/airfilter.avif",
+        width: 1200,
+        height: 630,
+        alt: "Mongoori Finds — Tesla Maintenance Essentials",
+      },
+    ],
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "Mongoori Finds | Tesla Maintenance Essentials",
+    description:
+      "Tesla maintenance essentials tested by a real rental fleet in California.",
+    images: ["/images/airfilter.avif"],
+  },
+  alternates: {
+    canonical: "https://finds.mongoori.com",
   },
 };
 
@@ -41,7 +65,9 @@ export default function RootLayout({
                 "@type": "Organization",
                 name: "Mongoori Finds",
                 description: "Tesla maintenance essentials tested by a real rental fleet in California.",
-                url: "https://mongoorifinds.com",
+                url: "https://finds.mongoori.com",
+                logo: "https://finds.mongoori.com/favicon.ico",
+                sameAs: ["https://mongoori.com"],
               }),
             }}
           />

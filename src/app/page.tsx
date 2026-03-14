@@ -3,6 +3,7 @@ import { getFeaturedProducts } from "@/lib/products";
 import ProductCard from "@/components/ProductCard";
 import TrustBadge from "@/components/TrustBadge";
 import HeroSlider from "@/components/HeroSlider";
+import RidesCrossellBanner from "@/components/RidesCrossellBanner";
 
 export default function HomePage() {
   const featured = getFeaturedProducts();
@@ -67,6 +68,8 @@ export default function HomePage() {
           </div>
         </div>
       </section>
+
+      <RidesCrossellBanner />
 
       <section aria-labelledby="trust-heading" className="py-20 sm:py-28 border-t border-black/5 dark:border-white/5">
         <div className="max-w-3xl mx-auto px-4 sm:px-6 text-center">
