@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import Stripe from "stripe";
 import { sendOrderEmails, sendPaymentFailedEmail } from "@/lib/email";
+import { earnPoints } from "@/lib/points";
 
 // Next.js App Router: read raw body for Stripe signature verification
 export async function POST(req: NextRequest) {
@@ -50,6 +51,21 @@ export async function POST(req: NextRequest) {
             { limit: 100 }
           );
           await sendOrderEmails(session, lineItems.data);
+
+          // Accrue loyalty points
+          const customerEmail =
+            session.metadata?.customerEmail ||
+            session.customer_details?.email ||
+            session.customer_email;
+          const isHost = session.metadata?.isHost === "true";
+          const amountPaidCents = session.amount_total ?? 0;
+          if (customerEmail && amountPaidCents > 0) {
+            try {
+              await earnPoints(customerEmail, amountPaidCents, isHost, session.id);
+            } catch (err) {
+              console.error("Points earn error:", err);
+            }
+          }
         }
         break;
       }
