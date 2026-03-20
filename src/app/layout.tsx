@@ -3,6 +3,7 @@ import { Inter } from "next/font/google";
 import "./globals.css";
 import { CartProvider } from "@/context/CartContext";
 import { VehicleProvider } from "@/context/VehicleContext";
+import { HostProvider } from "@/context/HostContext";
 import PromoBanner from "@/components/PromoBanner";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
@@ -56,6 +57,7 @@ export default function RootLayout({
     <html lang="en" className="scroll-smooth">
       <body className={`${inter.variable} font-sans antialiased min-h-screen flex flex-col`}>
         <CartProvider>
+          <HostProvider>
           <VehicleProvider>
           <script
             type="application/ld+json"
@@ -82,6 +84,7 @@ export default function RootLayout({
           <main className="flex-1">{children}</main>
           <Footer />
           </VehicleProvider>
+          </HostProvider>
         </CartProvider>
       </body>
     </html>

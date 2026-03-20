@@ -3,7 +3,7 @@ import ProductImage from "@/components/ProductImage";
 import { notFound } from "next/navigation";
 import { getProductBySlug, formatPrice } from "@/lib/products";
 import AddToCartButton from "./AddToCartButton";
-import ReviewPlaceholder from "@/components/ReviewPlaceholder";
+import ReviewSection from "@/components/ReviewSection";
 import TrustBadge from "@/components/TrustBadge";
 import RidesCrossellBanner from "@/components/RidesCrossellBanner";
 import type { Metadata } from "next";
@@ -184,7 +184,7 @@ export default async function ProductPage({ params }: Props) {
       </div>
 
       <section className="mt-16 pt-16 border-t border-border">
-        <ReviewPlaceholder title="Customer reviews" />
+        <ReviewSection productId={product.id} productSlug={product.slug} />
       </section>
 
       <div className="mt-16 -mx-4 sm:-mx-6">

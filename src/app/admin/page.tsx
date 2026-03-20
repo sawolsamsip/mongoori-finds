@@ -4,6 +4,20 @@ import { useEffect, useState } from "react";
 import Link from "next/link";
 import pkg from "../../../package.json";
 
+type Review = {
+  _id: string;
+  productId: string;
+  productSlug: string;
+  customerName: string;
+  customerEmail: string;
+  rating: number;
+  title: string;
+  body: string;
+  verified: boolean;
+  approved: boolean;
+  createdAt: string;
+};
+
 type Order = {
   id: string;
   paymentIntentId: string | null;
@@ -24,6 +38,7 @@ type Order = {
 };
 
 export default function AdminPage() {
+  const [tab, setTab] = useState<"orders" | "reviews">("orders");
   const [orders, setOrders] = useState<Order[] | null>(null);
   const [loading, setLoading] = useState(true);
   const [authError, setAuthError] = useState<string | null>(null);
@@ -34,6 +49,8 @@ export default function AdminPage() {
   const [shippingUpdates, setShippingUpdates] = useState<
     Record<string, { status: string; tracking: string }>
   >({});
+  const [reviews, setReviews] = useState<Review[] | null>(null);
+  const [reviewsLoading, setReviewsLoading] = useState(false);
 
   const fetchOrders = async () => {
     setLoading(true);
@@ -58,6 +75,41 @@ export default function AdminPage() {
   useEffect(() => {
     fetchOrders();
   }, []);
+
+  const fetchReviews = async () => {
+    setReviewsLoading(true);
+    const res = await fetch("/api/admin/reviews", { credentials: "include" });
+    if (!res.ok) {
+      setReviewsLoading(false);
+      return;
+    }
+    const data = await res.json();
+    setReviews(data.reviews ?? []);
+    setReviewsLoading(false);
+  };
+
+  const handleApproveReview = async (id: string, approved: boolean) => {
+    setActionLoading(id);
+    await fetch(`/api/admin/reviews/${id}`, {
+      method: "PATCH",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ approved }),
+      credentials: "include",
+    });
+    await fetchReviews();
+    setActionLoading(null);
+  };
+
+  const handleDeleteReview = async (id: string) => {
+    if (!confirm("Delete this review permanently?")) return;
+    setActionLoading(id);
+    await fetch(`/api/admin/reviews/${id}`, {
+      method: "DELETE",
+      credentials: "include",
+    });
+    await fetchReviews();
+    setActionLoading(null);
+  };
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -197,10 +249,10 @@ export default function AdminPage() {
 
   return (
     <div className="max-w-6xl mx-auto px-4 py-8">
-      <div className="flex flex-wrap items-center justify-between gap-4 mb-8">
+      <div className="flex flex-wrap items-center justify-between gap-4 mb-6">
         <div>
           <h1 className="text-2xl font-bold text-brand-black dark:text-brand-white">
-            Admin — 주문·배송·환불
+            Admin
           </h1>
           <p className="text-brand-slate dark:text-brand-silver text-sm mt-1">
             Mongoori Finds v{pkg.version}
@@ -209,11 +261,11 @@ export default function AdminPage() {
         <div className="flex items-center gap-3">
           <button
             type="button"
-            onClick={fetchOrders}
-            disabled={loading}
+            onClick={tab === "orders" ? fetchOrders : fetchReviews}
+            disabled={loading || reviewsLoading}
             className="rounded-lg border border-brand-border dark:border-brand-slate/30 px-4 py-2 text-sm font-medium text-brand-black dark:text-brand-white hover:bg-brand-slate/10 disabled:opacity-50"
           >
-            {loading ? "Refresh…" : "Refresh"}
+            {loading || reviewsLoading ? "Refresh…" : "Refresh"}
           </button>
           <button
             type="button"
@@ -231,13 +283,126 @@ export default function AdminPage() {
         </div>
       </div>
 
-      {orders?.length === 0 && (
+      {/* Tabs */}
+      <div className="flex gap-1 mb-8 border-b border-border">
+        <button
+          type="button"
+          onClick={() => setTab("orders")}
+          className={`px-4 py-2 text-sm font-medium border-b-2 transition-colors ${
+            tab === "orders"
+              ? "border-brand-black dark:border-brand-white text-brand-black dark:text-brand-white"
+              : "border-transparent text-brand-silver hover:text-brand-slate dark:hover:text-brand-silver"
+          }`}
+        >
+          Orders
+        </button>
+        <button
+          type="button"
+          onClick={() => {
+            setTab("reviews");
+            if (reviews === null) fetchReviews();
+          }}
+          className={`px-4 py-2 text-sm font-medium border-b-2 transition-colors ${
+            tab === "reviews"
+              ? "border-brand-black dark:border-brand-white text-brand-black dark:text-brand-white"
+              : "border-transparent text-brand-silver hover:text-brand-slate dark:hover:text-brand-silver"
+          }`}
+        >
+          Reviews
+        </button>
+      </div>
+
+      {/* Reviews tab */}
+      {tab === "reviews" && (
+        <div>
+          {reviewsLoading && (
+            <p className="text-brand-slate dark:text-brand-silver py-12 text-center">Loading reviews…</p>
+          )}
+          {!reviewsLoading && reviews?.length === 0 && (
+            <p className="text-brand-slate dark:text-brand-silver py-12 text-center">No reviews yet.</p>
+          )}
+          {!reviewsLoading && reviews && reviews.length > 0 && (
+            <div className="space-y-4">
+              {reviews.map((review) => (
+                <div
+                  key={review._id}
+                  className="rounded-xl border border-brand-border dark:border-brand-slate/30 bg-white dark:bg-brand-slate/10 p-5 shadow-sm"
+                >
+                  <div className="flex flex-wrap items-start justify-between gap-3">
+                    <div className="flex-1 min-w-0">
+                      <div className="flex items-center gap-2 flex-wrap">
+                        <span className="text-yellow-400 text-sm">{"★".repeat(review.rating)}{"☆".repeat(5 - review.rating)}</span>
+                        <span
+                          className={`text-xs font-medium px-2 py-0.5 rounded ${
+                            review.approved
+                              ? "bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-300"
+                              : "bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-300"
+                          }`}
+                        >
+                          {review.approved ? "Approved" : "Pending"}
+                        </span>
+                        {review.verified && (
+                          <span className="text-xs text-green-600 dark:text-green-400">✓ Verified</span>
+                        )}
+                        <span className="text-xs text-brand-silver">
+                          {new Date(review.createdAt).toLocaleDateString("en-US", { dateStyle: "short" })}
+                        </span>
+                      </div>
+                      <p className="mt-1 font-semibold text-brand-black dark:text-brand-white text-sm">
+                        {review.title}
+                      </p>
+                      <p className="mt-1 text-sm text-brand-slate dark:text-brand-silver leading-relaxed">
+                        {review.body}
+                      </p>
+                      <p className="mt-2 text-xs text-brand-silver">
+                        {review.customerName} · {review.customerEmail} · /products/{review.productSlug}
+                      </p>
+                    </div>
+                    <div className="flex flex-col gap-2 shrink-0">
+                      {!review.approved ? (
+                        <button
+                          type="button"
+                          onClick={() => handleApproveReview(review._id, true)}
+                          disabled={actionLoading === review._id}
+                          className="rounded-lg bg-green-600 text-white px-3 py-1.5 text-xs font-medium hover:bg-green-700 disabled:opacity-50"
+                        >
+                          {actionLoading === review._id ? "…" : "Approve"}
+                        </button>
+                      ) : (
+                        <button
+                          type="button"
+                          onClick={() => handleApproveReview(review._id, false)}
+                          disabled={actionLoading === review._id}
+                          className="rounded-lg border border-brand-border dark:border-brand-slate/30 text-brand-slate dark:text-brand-silver px-3 py-1.5 text-xs font-medium hover:bg-brand-slate/10 disabled:opacity-50"
+                        >
+                          {actionLoading === review._id ? "…" : "Unapprove"}
+                        </button>
+                      )}
+                      <button
+                        type="button"
+                        onClick={() => handleDeleteReview(review._id)}
+                        disabled={actionLoading === review._id}
+                        className="rounded-lg border border-red-200 dark:border-red-900/50 text-red-600 dark:text-red-400 px-3 py-1.5 text-xs font-medium hover:bg-red-50 dark:hover:bg-red-900/20 disabled:opacity-50"
+                      >
+                        Delete
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
+      )}
+
+      {/* Orders tab */}
+      {tab === "orders" && orders?.length === 0 && (
         <p className="text-brand-slate dark:text-brand-silver py-12 text-center">
           No orders yet.
         </p>
       )}
 
-      {orders && orders.length > 0 && (
+      {tab === "orders" && orders && orders.length > 0 && (
         <div className="space-y-6">
           {orders.map((order) => (
             <div
