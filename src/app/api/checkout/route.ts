@@ -88,10 +88,17 @@ export async function POST(req: NextRequest) {
       success_url: `${baseUrl}/checkout/success?session_id={CHECKOUT_SESSION_ID}`,
       cancel_url: `${baseUrl}/cart`,
       metadata: {
+        type: "finds_order",
         customerEmail: hostEmail || customerEmail || "",
         isHost: isVerifiedHost ? "true" : "false",
         pointsRedeemed: String(pointsToRedeem),
         pointsOrderId,
+      },
+      // Also tag the PaymentIntent so the webhook can tell a Finds payment failure apart from
+      // Rides/Fleet PIs that share this Stripe account (checkout metadata does NOT propagate
+      // to the PI automatically).
+      payment_intent_data: {
+        metadata: { type: "finds_order", pointsOrderId },
       },
     };
 

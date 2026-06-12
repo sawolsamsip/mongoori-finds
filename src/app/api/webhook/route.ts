@@ -45,6 +45,14 @@ export async function POST(req: NextRequest) {
     switch (event.type) {
       case "checkout.session.completed": {
         const session = event.data.object as Stripe.Checkout.Session;
+        // Only process Finds orders — ignore Rides/Fleet checkouts that share this Stripe
+        // account. Gate POSITIVELY: a Finds checkout always stamps metadata.type="finds_order"
+        // (see /api/checkout). Anything else (incl. sessions with no type) is NOT a Finds order,
+        // so do not send a "Mongoori Finds" order email for it.
+        if (session.metadata?.type !== "finds_order") {
+          console.log("Skipping non-Finds checkout session:", session.id, "type:", session.metadata?.type || "(none)");
+          break;
+        }
         if (session.payment_status === "paid") {
           const lineItems = await stripe.checkout.sessions.listLineItems(
             session.id,
@@ -77,6 +85,14 @@ export async function POST(req: NextRequest) {
           paymentIntent.id,
           paymentIntent.last_payment_error?.message
         );
+        // Only Finds payment failures get a "Mongoori Finds" alert. Rides/Fleet PIs (mileage,
+        // surcharge, charging, deposit holds, …) share this Stripe account and must NOT trigger
+        // a Finds email. Finds checkouts now stamp the PI with metadata.type="finds_order"
+        // (see /api/checkout payment_intent_data).
+        if (paymentIntent.metadata?.type !== "finds_order") {
+          console.log("Skipping non-Finds payment failure:", paymentIntent.id, "type:", paymentIntent.metadata?.type || "(none)");
+          break;
+        }
         await sendPaymentFailedEmail(paymentIntent);
         break;
       }
