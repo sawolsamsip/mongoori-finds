@@ -28,3 +28,18 @@ yarn-error.log*
 # TypeScript
 *.tsbuildinfo
 next-env.d.ts
+
+# Python bytecode from scripts/
+__pycache__/
+*.py[cod]
+
+# Editor and shell backups made in place
+*.bak
+*.bak[0-9]
+*.bak.*
+*.bak-*
+*.bak[0-9].*
+
+# Monitor runtime state and its log
+scripts/*.log
+scripts/tesla_seen_vins.json
