@@ -7,6 +7,7 @@ import { HostProvider } from "@/context/HostContext";
 import PromoBanner from "@/components/PromoBanner";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
+import ChatBot from "@/components/ChatBot";
 
 const inter = Inter({ subsets: ["latin"], variable: "--font-sans" });
 
@@ -83,6 +84,7 @@ export default function RootLayout({
           <Header />
           <main className="flex-1">{children}</main>
           <Footer />
+          <ChatBot greeting="Hi! Looking for Tesla maintenance products? I can help you find the right parts for your Model 3 or Model Y." accentColor="#3b82f6" />
           </VehicleProvider>
           </HostProvider>
         </CartProvider>
