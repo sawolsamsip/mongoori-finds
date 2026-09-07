@@ -34,7 +34,7 @@ function htmlWrapper(content: string): string {
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Mongoori Finds</title>
+  <title>Mongoori</title>
 </head>
 <body style="margin:0;padding:0;background-color:#f5f5f5;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif;">
   <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background-color:#f5f5f5;padding:32px 16px;">
@@ -43,9 +43,9 @@ function htmlWrapper(content: string): string {
         <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="max-width:600px;">
           <!-- Header -->
           <tr>
-            <td style="background-color:#0a0a0a;border-radius:12px 12px 0 0;padding:24px 32px;">
-              <p style="margin:0;color:#ffffff;font-size:20px;font-weight:700;letter-spacing:-0.5px;">Mongoori Finds</p>
-              <p style="margin:4px 0 0;color:#888888;font-size:13px;">finds.mongoori.com</p>
+            <td style="background-color:#3f63f3;border-radius:12px 12px 0 0;padding:24px 32px;">
+              <p style="margin:0;color:#ffffff;font-size:20px;font-weight:700;letter-spacing:-0.5px;">Mongoori</p>
+              <p style="margin:4px 0 0;color:#c4d0fd;font-size:13px;">mongoori.com</p>
             </td>
           </tr>
           <!-- Body -->
@@ -58,8 +58,8 @@ function htmlWrapper(content: string): string {
           <tr>
             <td style="background-color:#f9f9f9;border:1px solid #e5e5e5;border-radius:0 0 12px 12px;padding:20px 32px;">
               <p style="margin:0;color:#888888;font-size:12px;line-height:1.5;">
-                Mongoori Finds · Tesla Accessories<br/>
-                Questions? Reply to this email or visit <a href="https://finds.mongoori.com" style="color:#0a0a0a;text-decoration:underline;">finds.mongoori.com</a>
+                Mongoori<br/>
+                Questions? Reply to this email or visit <a href="https://mongoori.com" style="color:#3f63f3;text-decoration:underline;">mongoori.com</a>
               </p>
             </td>
           </tr>
@@ -159,7 +159,7 @@ function buildCustomerConfirmationHtml(
   const items = buildLineItemsFromStripe(lineItems);
 
   const content = `
-    <h1 style="margin:0 0 8px;font-size:24px;font-weight:700;color:#0a0a0a;letter-spacing:-0.5px;">Order Confirmed</h1>
+    <h1 style="margin:0 0 8px;font-size:24px;font-weight:700;color:#1a1a1a;letter-spacing:-0.5px;">Order Confirmed</h1>
     <p style="margin:0 0 24px;font-size:15px;color:#444444;line-height:1.6;">Hi ${customerName}, thank you for your purchase! Your order has been received and is being prepared.</p>
 
     <div style="background-color:#f9f9f9;border:1px solid #e5e5e5;border-radius:8px;padding:16px 20px;margin-bottom:24px;">
@@ -179,18 +179,18 @@ function buildCustomerConfirmationHtml(
       </table>
     </div>
 
-    <h2 style="margin:0 0 16px;font-size:15px;font-weight:600;color:#0a0a0a;">Order Summary</h2>
+    <h2 style="margin:0 0 16px;font-size:15px;font-weight:600;color:#1a1a1a;">Order Summary</h2>
     ${itemsTable(items, session.currency ?? "usd")}
 
     <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="margin-top:16px;">
       <tr>
-        <td style="font-size:15px;font-weight:700;color:#0a0a0a;padding-top:12px;border-top:2px solid #0a0a0a;">Total</td>
-        <td style="font-size:15px;font-weight:700;color:#0a0a0a;text-align:right;padding-top:12px;border-top:2px solid #0a0a0a;">${total}</td>
+        <td style="font-size:15px;font-weight:700;color:#3f63f3;padding-top:12px;border-top:2px solid #3f63f3;">Total</td>
+        <td style="font-size:15px;font-weight:700;color:#3f63f3;text-align:right;padding-top:12px;border-top:2px solid #3f63f3;">${total}</td>
       </tr>
     </table>
 
     <div style="margin-top:32px;text-align:center;">
-      <a href="https://finds.mongoori.com/products" style="display:inline-block;background-color:#0a0a0a;color:#ffffff;text-decoration:none;padding:12px 28px;border-radius:8px;font-size:14px;font-weight:600;">Continue Shopping</a>
+      <a href="https://finds.mongoori.com/products" style="display:inline-block;background-color:#3f63f3;color:#ffffff;text-decoration:none;padding:12px 28px;border-radius:8px;font-size:14px;font-weight:600;">Continue Shopping</a>
     </div>
 
     <p style="margin:32px 0 0;font-size:13px;color:#888888;line-height:1.6;">We'll send you another email once your order ships. If you have any questions, simply reply to this email.</p>`;
@@ -211,7 +211,7 @@ function buildCustomerConfirmationText(
   return [
     `Hi ${customerName},`,
     "",
-    "Your order is confirmed! Thank you for shopping at Mongoori Finds.",
+    "Your order is confirmed! Thank you for shopping at Mongoori.",
     "",
     `Order ID: ${session.id}`,
     `Total: ${total}`,
@@ -221,7 +221,7 @@ function buildCustomerConfirmationText(
     "",
     "We'll email you when your order ships.",
     "",
-    "— Mongoori Finds",
+    "— Mongoori",
   ].join("\n");
 }
 
@@ -248,16 +248,16 @@ function buildCustomerShippingHtml(data: ShippingEmailData): string {
   const name = customerName ?? "Valued Customer";
   const isDelivered = shippingStatus === "delivered";
   const statusLabel = isDelivered ? "Delivered" : "Shipped";
-  const statusColor = isDelivered ? "#16a34a" : "#2563eb";
+  const statusColor = isDelivered ? "#16a34a" : "#3f63f3";
   const headline = isDelivered ? "Your order has been delivered!" : "Your order is on its way!";
   const subtitle = isDelivered
-    ? `Hi ${name}, your Mongoori Finds order has been delivered. We hope you love it!`
+    ? `Hi ${name}, your Mongoori order has been delivered. We hope you love it!`
     : `Hi ${name}, great news — your order has shipped and is heading your way.`;
 
   const trackingBlock = trackingNumber
-    ? `<div style="background-color:#f0f9ff;border:1px solid #bae6fd;border-radius:8px;padding:16px 20px;margin:20px 0;">
-        <p style="margin:0 0 4px;font-size:12px;font-weight:600;color:#0369a1;text-transform:uppercase;letter-spacing:0.5px;">Tracking Number</p>
-        <p style="margin:0;font-size:16px;font-weight:700;color:#0c4a6e;font-family:monospace;">${trackingNumber}</p>
+    ? `<div style="background-color:#eef3ff;border:1px solid #c4d0fd;border-radius:8px;padding:16px 20px;margin:20px 0;">
+        <p style="margin:0 0 4px;font-size:12px;font-weight:600;color:#3f63f3;text-transform:uppercase;letter-spacing:0.5px;">Tracking Number</p>
+        <p style="margin:0;font-size:16px;font-weight:700;color:#2f4fe0;font-family:monospace;">${trackingNumber}</p>
       </div>`
     : "";
 
@@ -265,7 +265,7 @@ function buildCustomerShippingHtml(data: ShippingEmailData): string {
 
   const content = `
     <div style="margin-bottom:8px;">${deliveredBadge}</div>
-    <h1 style="margin:12px 0 8px;font-size:24px;font-weight:700;color:#0a0a0a;letter-spacing:-0.5px;">${headline}</h1>
+    <h1 style="margin:12px 0 8px;font-size:24px;font-weight:700;color:#1a1a1a;letter-spacing:-0.5px;">${headline}</h1>
     <p style="margin:0 0 24px;font-size:15px;color:#444444;line-height:1.6;">${subtitle}</p>
 
     ${trackingBlock}
@@ -287,11 +287,11 @@ function buildCustomerShippingHtml(data: ShippingEmailData): string {
       </table>
     </div>
 
-    <h2 style="margin:0 0 16px;font-size:15px;font-weight:600;color:#0a0a0a;">Items</h2>
+    <h2 style="margin:0 0 16px;font-size:15px;font-weight:600;color:#1a1a1a;">Items</h2>
     ${itemsTable(lineItems, currency)}
 
     <div style="margin-top:32px;text-align:center;">
-      <a href="https://finds.mongoori.com/products" style="display:inline-block;background-color:#0a0a0a;color:#ffffff;text-decoration:none;padding:12px 28px;border-radius:8px;font-size:14px;font-weight:600;">Shop Again</a>
+      <a href="https://finds.mongoori.com/products" style="display:inline-block;background-color:#3f63f3;color:#ffffff;text-decoration:none;padding:12px 28px;border-radius:8px;font-size:14px;font-weight:600;">Shop Again</a>
     </div>
 
     <p style="margin:32px 0 0;font-size:13px;color:#888888;line-height:1.6;">Questions about your order? Reply to this email and we'll be happy to help.</p>`;
@@ -321,7 +321,7 @@ function buildSupplierEmailHtml(
   const items = buildLineItemsFromStripe(lineItems);
 
   const content = `
-    <h1 style="margin:0 0 8px;font-size:22px;font-weight:700;color:#0a0a0a;">New Order — Fulfillment Required</h1>
+    <h1 style="margin:0 0 8px;font-size:22px;font-weight:700;color:#1a1a1a;">New Order — Fulfillment Required</h1>
     <p style="margin:0 0 24px;font-size:14px;color:#666666;">Please process and ship the following order.</p>
 
     <div style="background-color:#f9f9f9;border:1px solid #e5e5e5;border-radius:8px;padding:16px 20px;margin-bottom:24px;">
@@ -333,11 +333,11 @@ function buildSupplierEmailHtml(
         <tr><td style="font-size:13px;color:#888888;padding:3px 0;">Email</td><td style="font-size:13px;color:#1a1a1a;">${customerEmail}</td></tr>
         <tr><td style="font-size:13px;color:#888888;padding:3px 0;">Phone</td><td style="font-size:13px;color:#1a1a1a;">${customerPhone}</td></tr>
         <tr><td style="font-size:13px;color:#888888;padding:3px 0;">Ship to</td><td style="font-size:13px;color:#1a1a1a;">${shippingAddress}</td></tr>
-        <tr><td style="font-size:13px;color:#888888;padding:3px 0;">Total</td><td style="font-size:14px;font-weight:700;color:#0a0a0a;">${total}</td></tr>
+        <tr><td style="font-size:13px;color:#888888;padding:3px 0;">Total</td><td style="font-size:14px;font-weight:700;color:#3f63f3;">${total}</td></tr>
       </table>
     </div>
 
-    <h2 style="margin:0 0 16px;font-size:15px;font-weight:600;color:#0a0a0a;">Items to Ship</h2>
+    <h2 style="margin:0 0 16px;font-size:15px;font-weight:600;color:#1a1a1a;">Items to Ship</h2>
     ${itemsTable(items, session.currency ?? "usd")}`;
 
   return htmlWrapper(content);
@@ -360,8 +360,8 @@ function buildAdminEmailHtml(
   const items = buildLineItemsFromStripe(lineItems);
 
   const content = `
-    <h1 style="margin:0 0 8px;font-size:22px;font-weight:700;color:#0a0a0a;">New Order Received</h1>
-    <p style="margin:0 0 24px;font-size:14px;color:#666666;">A new order has been completed on Mongoori Finds.</p>
+    <h1 style="margin:0 0 8px;font-size:22px;font-weight:700;color:#1a1a1a;">New Order Received</h1>
+    <p style="margin:0 0 24px;font-size:14px;color:#666666;">A new order has been completed on Mongoori.</p>
 
     <div style="background-color:#f0fdf4;border:1px solid #bbf7d0;border-radius:8px;padding:16px 20px;margin-bottom:24px;text-align:center;">
       <p style="margin:0 0 4px;font-size:13px;color:#16a34a;font-weight:600;">Order Total</p>
@@ -376,7 +376,7 @@ function buildAdminEmailHtml(
       </table>
     </div>
 
-    <h2 style="margin:0 0 16px;font-size:15px;font-weight:600;color:#0a0a0a;">Items</h2>
+    <h2 style="margin:0 0 16px;font-size:15px;font-weight:600;color:#1a1a1a;">Items</h2>
     ${itemsTable(items, session.currency ?? "usd")}`;
 
   return htmlWrapper(content);
@@ -417,7 +417,7 @@ export async function sendOrderEmails(
     await transporter.sendMail({
       from,
       to: supplierEmail,
-      subject: `[Mongoori Finds] New order — ${session.id}`,
+      subject: `[Mongoori] New order — ${session.id}`,
       html: buildSupplierEmailHtml(session, lineItems),
       text: `New order received: ${session.id}\nTotal: ${totalStr}\nCustomer: ${session.customer_details?.email ?? "N/A"}`,
     });
@@ -429,7 +429,7 @@ export async function sendOrderEmails(
     await transporter.sendMail({
       from,
       to: adminEmail,
-      subject: `[Mongoori Finds] New order — ${totalStr}`,
+      subject: `[Mongoori] New order — ${totalStr}`,
       html: buildAdminEmailHtml(session, lineItems),
       text: `New order: ${session.id}\nTotal: ${totalStr}`,
     });
@@ -448,8 +448,8 @@ export async function sendCustomerShippingEmail(
   const from = process.env.SMTP_FROM ?? process.env.SMTP_USER;
   const isDelivered = data.shippingStatus === "delivered";
   const subject = isDelivered
-    ? `Your Mongoori Finds order has been delivered`
-    : `Your Mongoori Finds order has shipped${data.trackingNumber ? ` — ${data.trackingNumber}` : ""}`;
+    ? `Your Mongoori order has been delivered`
+    : `Your Mongoori order has shipped${data.trackingNumber ? ` — ${data.trackingNumber}` : ""}`;
 
   const text = [
     `Hi ${data.customerName ?? "there"},`,
@@ -460,7 +460,7 @@ export async function sendCustomerShippingEmail(
     ...(data.trackingNumber ? [`Tracking: ${data.trackingNumber}`] : []),
     `Order ID: ${data.orderId}`,
     "",
-    "— Mongoori Finds",
+    "— Mongoori",
   ].join("\n");
 
   await transporter.sendMail({
@@ -485,7 +485,7 @@ export async function sendPaymentFailedEmail(
 
   const content = `
     <h1 style="margin:0 0 8px;font-size:22px;font-weight:700;color:#dc2626;">Payment Failed</h1>
-    <p style="margin:0 0 24px;font-size:14px;color:#666666;">A payment attempt has failed on Mongoori Finds.</p>
+    <p style="margin:0 0 24px;font-size:14px;color:#666666;">A payment attempt has failed on Mongoori.</p>
     <div style="background-color:#fef2f2;border:1px solid #fecaca;border-radius:8px;padding:16px 20px;">
       <table role="presentation" width="100%" cellpadding="0" cellspacing="0">
         <tr><td style="font-size:13px;color:#888888;padding:3px 0;width:160px;">Payment Intent ID</td><td style="font-size:13px;color:#1a1a1a;font-family:monospace;">${paymentIntent.id}</td></tr>
@@ -497,7 +497,7 @@ export async function sendPaymentFailedEmail(
   await transporter.sendMail({
     from,
     to: adminEmail,
-    subject: `[Mongoori Finds] Payment failed — ${amount}`,
+    subject: `[Mongoori] Payment failed — ${amount}`,
     html: htmlWrapper(content),
     text: `Payment failed.\nPayment Intent ID: ${paymentIntent.id}\nAmount: ${amount}\nError: ${errorMsg}`,
   });
